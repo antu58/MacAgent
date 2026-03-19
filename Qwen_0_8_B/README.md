@@ -1,91 +1,85 @@
-# Qwen3.5 0.8B (MLX 8bit) 本地部署记录
+# Qwen_0_8_B 项目说明
 
 更新时间：2026-03-19
 
-## 当前状态
+## 项目目标
 
-- 已安装 Homebrew：`/opt/homebrew/bin/brew`
-- 已安装 Python 3.11：`/opt/homebrew/bin/python3.11`
-- 已完成模型与依赖初始化：`mlx-community/Qwen3.5-0.8B-8bit`
-- 已启用持久化缓存目录：`/Users/zhangfeng/.mlx-qwen35`
-- 已取消自动启动（不使用 launchd），改为项目内脚本手动控制
+本项目用于在本地运行 **Qwen3.5 0.8B (MLX 8bit)** 模型服务，提供 OpenAI 兼容接口：
 
-## 架构说明（与你需求一致）
+- 服务地址：`http://127.0.0.1:18080/v1`
+- 当前仅包含 `0.8B` 模型服务能力
+- 后续会在此基础上继续补充更多模型与功能模块
 
-- 模型服务使用 Apple MLX 原生服务：`mlx_lm.server`
-- 模型版本：`Qwen3.5 0.8B 8bit (MLX Community)`
-- 缓存持久化在宿主机目录，重启服务不会重复下载模型
-- Docker 内应用通过 `host.docker.internal` 调用宿主机服务
+## 环境需求
 
-## 目录与脚本
+1. 操作系统：`macOS`（推荐 Apple Silicon，MLX 原生运行）
+2. Python：`3.11+`（已验证 `3.11.15`）
+3. Homebrew：用于安装 Python（可选但推荐）
+4. 网络：首次初始化需要下载 `mlx-lm` 依赖和模型文件
+5. 磁盘：至少预留 `5GB+`（模型缓存、虚拟环境、日志）
 
-- `scripts/common.env`：统一配置（模型名、端口、缓存目录等）
-- `scripts/setup_mlx_service.sh`：初始化环境、安装依赖、预下载模型
-- `scripts/start_mlx_service.sh`：前台启动服务（调试用）
-- `scripts/start_service.sh`：后台启动服务（项目内 PID 管理）
-- `scripts/stop_service.sh`：停止后台服务
-- `scripts/status_service.sh`：查看后台服务状态
-
-## 一次性初始化
+## 快速开始
 
 ```bash
 cd /Users/zhangfeng/Desktop/Project/Apple/MacAgent/Qwen_0_8_B
 chmod +x scripts/*.sh
 ./scripts/setup_mlx_service.sh
+./scripts/start_service.sh
+./scripts/status_service.sh
 ```
 
-## 日常启动/停止
+停止服务：
 
 ```bash
-# 后台启动（若有旧实例会自动先停止再启动新实例）
-./scripts/start_service.sh
-
-# 查看状态
-./scripts/status_service.sh
-
-# 停止服务
 ./scripts/stop_service.sh
 ```
 
-默认接口：
+## 目录说明
 
-- `http://127.0.0.1:18080/v1`
+1. `scripts/`：服务脚本与测试脚本目录
+   - `common.env`：统一配置（模型名、端口、缓存路径）
+   - `setup_mlx_service.sh`：初始化依赖并预下载模型
+   - `start_mlx_service.sh`：前台启动 MLX 服务
+   - `start_service.sh`：后台启动（会自动停止旧实例再启动）
+   - `stop_service.sh`：停止后台服务
+   - `status_service.sh`：查看服务状态
+   - `test_tool_call_accuracy.sh`：工具调用准确率 + 性能指标测试入口
+   - `tool_call_benchmark.py`：性能统计实现（TTFT/总耗时/tokens/s）
 
-运行日志与 PID：
+2. `run/`：运行时产物目录
+   - `qwen35-mlx.log`：服务日志
+   - `qwen35-mlx.pid`：后台进程 PID
+   - `tool_call_benchmark_*.jsonl`：工具调用测试原始报告
 
-- 日志：`/Users/zhangfeng/Desktop/Project/Apple/MacAgent/Qwen_0_8_B/run/qwen35-mlx.log`
-- PID：`/Users/zhangfeng/Desktop/Project/Apple/MacAgent/Qwen_0_8_B/run/qwen35-mlx.pid`
+3. `README.md`：项目说明文档（本文件）
 
-## 连通性验证
+4. `TOOL_CALL_CASES.md`：工具调用案例与测试说明
 
-```bash
-curl -s -X POST http://127.0.0.1:18080/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "mlx-community/Qwen3.5-0.8B-8bit",
-    "messages": [{"role": "user", "content": "你好，回复ok"}],
-    "max_tokens": 16
-  }'
-```
+## 缓存与持久化
 
-## Docker 中调用方式
-
-容器内基地址使用：
-
-- `http://host.docker.internal:18080/v1`
-
-示例（OpenAI 兼容 SDK 的 base_url）：
-
-- `http://host.docker.internal:18080/v1`
-
-## 关键持久化配置
-
-`scripts/common.env` 中默认值：
+默认缓存根目录（在 `scripts/common.env` 中配置）：
 
 - `MLX_SERVICE_HOME=/Users/zhangfeng/.mlx-qwen35`
 - `VENV_DIR=/Users/zhangfeng/.mlx-qwen35/venv`
 - `HF_HOME=/Users/zhangfeng/.mlx-qwen35/hf`
 - `HUGGINGFACE_HUB_CACHE=/Users/zhangfeng/.mlx-qwen35/hf/hub`
-- `TRANSFORMERS_CACHE=/Users/zhangfeng/.mlx-qwen35/hf/transformers`
 
-只要保留该目录，服务重启不会重复下载模型。
+只要保留上述目录，重启服务不会重复下载模型。
+
+## Docker 调用方式
+
+如需在 Docker 容器内访问本机服务，请使用：
+
+- `http://host.docker.internal:18080/v1`
+
+## 当前范围与后续补充
+
+当前范围：
+
+- 仅支持 `Qwen3.5-0.8B-8bit (MLX)` 本地服务
+
+后续计划（待补充）：
+
+- 更多模型版本（如更大参数量）
+- 更完整的基准测试与回归报告
+- 服务编排与多模型切换能力

@@ -4,3 +4,8 @@ __pycache__/
 *.pyo
 *.log
 .DS_Store
+
+# Embedded model assets (large binaries)
+Main/Agent/InferenceService/EmbeddedModel/Qwen3.5-0.8B-8bit/
+Main/Agent/InferenceService/EmbeddedRuntime/venv/
+Main/Agent/LocalModels/
