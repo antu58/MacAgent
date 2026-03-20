@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Intent Playground</title>
+    <style>
+      :root {
+        --bg: #f4f1e8;
+        --panel: #fffdf7;
+        --panel-2: #f7f3ea;
+        --ink: #1f2a32;
+        --muted: #65717a;
+        --line: #d7cfbf;
+        --brand: #0e6c78;
+        --brand-2: #1b8a6f;
+        --accent: #c65f2a;
+        --warn: #ae4029;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 0% 0%, rgba(16, 138, 111, 0.16), transparent 34%),
+          radial-gradient(circle at 100% 10%, rgba(198, 95, 42, 0.14), transparent 28%),
+          var(--bg);
+        font-family: "Avenir Next", "PingFang SC", "Noto Sans SC", sans-serif;
+      }
+      .page {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+      .header {
+        margin-bottom: 18px;
+      }
+      .title {
+        margin: 0 0 6px;
+        font-size: clamp(24px, 3.2vw, 42px);
+        letter-spacing: 0.02em;
+      }
+      .desc {
+        margin: 0;
+        color: var(--muted);
+        max-width: 780px;
+      }
+      .layout {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 1120px) {
+        .layout {
+          grid-template-columns: 390px minmax(0, 1fr);
+          align-items: start;
+        }
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 16px 40px rgba(31, 42, 50, 0.06);
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 16px 16px 10px;
+      }
+      .panel-title {
+        margin: 0;
+        font-size: 16px;
+      }
+      .panel-subtitle {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .scroll {
+        padding: 0 16px 16px;
+      }
+      .intent-list {
+        display: grid;
+        gap: 12px;
+      }
+      .intent-card {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel-2);
+      }
+      .intent-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .intent-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(14, 108, 120, 0.12);
+        color: var(--brand);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+      .intent-meta {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .intent-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr;
+      }
+      .intent-note {
+        padding: 10px 12px;
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        background: rgba(14, 108, 120, 0.05);
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      input, textarea, select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--ink);
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 96px;
+      }
+      .param-section {
+        margin-top: 12px;
+      }
+      .param-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .param-title {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .param-list {
+        display: grid;
+        gap: 8px;
+      }
+      .param-row {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        padding: 10px;
+      }
+      .param-row.compact {
+        padding: 12px;
+      }
+      .param-stack {
+        display: grid;
+        gap: 10px;
+      }
+      .param-grid {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 1fr 1fr;
+      }
+      .param-grid.full {
+        grid-template-columns: 1fr;
+      }
+      .param-block {
+        margin-top: 10px;
+      }
+      .param-block.hidden {
+        display: none;
+      }
+      .enum-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .enum-item {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      .mini-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 10px 16px;
+        color: #fff;
+        background: linear-gradient(120deg, var(--brand), var(--brand-2));
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button.secondary {
+        background: #eef1f2;
+        color: #334048;
+      }
+      button.ghost {
+        background: transparent;
+        color: var(--accent);
+        border: 1px solid rgba(198, 95, 42, 0.3);
+      }
+      .meta-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr;
+        margin-bottom: 14px;
+      }
+      @media (min-width: 760px) {
+        .meta-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .composer {
+        padding: 16px;
+      }
+      .send-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .send-row button {
+        min-width: 110px;
+      }
+      .logs {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: 1fr;
+        margin-top: 16px;
+      }
+      @media (min-width: 980px) {
+        .logs {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      pre {
+        margin: 0;
+        min-height: 280px;
+        max-height: 520px;
+        overflow: auto;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: #fbfaf6;
+        font-size: 13px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .empty {
+        color: var(--muted);
+      }
+      .danger {
+        color: var(--warn);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <h1 class="title">Intent Playground</h1>
+        <p class="desc">左侧配置意图和参数格式，右侧直接发一句话。Gateway 会先做意图识别和参数抽取，命中后把意图和参数结果返回到页面，不执行真实任务。</p>
+      </div>
+
+      <div class="layout">
+        <aside class="card">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">意图配置</h2>
+              <p class="panel-subtitle">这是一个意图列表。页面只配置功能描述和参数，内部意图名会自动生成并随请求一起发送。</p>
+            </div>
+            <button id="addIntentBtn" type="button">新增意图</button>
+          </div>
+          <div class="scroll">
+            <div class="intent-list" id="intentList"></div>
+          </div>
+        </aside>
+
+        <main>
+          <section class="card composer">
+            <div class="meta-grid">
+              <div>
+                <label class="label" for="gatewayInfo">Gateway 地址</label>
+                <input id="gatewayInfo" disabled />
+              </div>
+              <div>
+                <label class="label" for="sessionId">Session ID</label>
+                <input id="sessionId" value="web-user" />
+              </div>
+            </div>
+
+            <label class="label" for="message">用户输入</label>
+            <textarea id="message">客厅的灯亮点一点</textarea>
+            <div class="send-row">
+              <button id="btnSend" type="button">发送</button>
+              <button id="btnClear" type="button" class="secondary">清空日志</button>
+            </div>
+            <p class="hint">发送前会校验意图与参数配置。数字参数只能使用数字枚举和数字默认值；文字参数只能使用文字枚举。</p>
+          </section>
+
+          <section class="logs">
+            <div class="card">
+              <div class="panel-head">
+                <div>
+                  <h2 class="panel-title">Gateway 日志</h2>
+                  <p class="panel-subtitle">显示本次路由判断和抽取结果</p>
+                </div>
+              </div>
+              <div class="scroll">
+                <pre id="routeOut" class="empty"></pre>
+              </div>
+            </div>
+            <div class="card">
+              <div class="panel-head">
+                <div>
+                  <h2 class="panel-title">Chat 输出</h2>
+                  <p class="panel-subtitle">显示 Gateway 的流式状态和最终返回值</p>
+                </div>
+              </div>
+              <div class="scroll">
+                <pre id="chatOut" class="empty"></pre>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const routeOut = document.getElementById("routeOut");
+      const chatOut = document.getElementById("chatOut");
+      const sessionEl = document.getElementById("sessionId");
+      const messageEl = document.getElementById("message");
+      const gatewayInfoEl = document.getElementById("gatewayInfo");
+      const intentListEl = document.getElementById("intentList");
+
+      let aborter = null;
+      let intentSeq = 1;
+
+      function setOutput(target, text, isError = false) {
+        target.textContent = text || "";
+        target.classList.toggle("empty", !text);
+        target.classList.toggle("danger", isError);
+      }
+
+      function append(target, text, isError = false) {
+        const line = isError ? `[ERR] ${text}` : text;
+        target.textContent += (target.textContent ? "\n" : "") + line;
+        target.classList.remove("empty");
+        if (isError) target.classList.add("danger");
+        target.scrollTop = target.scrollHeight;
+      }
+
+      function createEnumItem(value = "") {
+        const item = document.createElement("div");
+        item.className = "enum-item";
+        item.innerHTML = `
+          <input class="enum-value" value="${escapeAttr(value)}" placeholder="输入一个枚举值" />
+          <button type="button" class="ghost mini-btn remove-enum-btn">删除</button>
+        `;
+        item.querySelector(".remove-enum-btn").addEventListener("click", () => item.remove());
+        return item;
+      }
+
+      function createParamRow(param = {}) {
+        const row = document.createElement("div");
+        row.className = "param-row compact";
+        row.innerHTML = `
+          <div class="param-stack">
+            <div>
+              <label class="label">参数名</label>
+              <input class="param-name" value="${escapeAttr(param.name || "")}" placeholder="room_name" />
+            </div>
+            <div>
+              <label class="label">参数描述</label>
+              <input class="param-description" value="${escapeAttr(param.description || "")}" placeholder="房间名称" />
+            </div>
+            <div>
+              <label class="label">参数类型</label>
+              <select class="param-value-type">
+                <option value="text">文字</option>
+                <option value="number">数字</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">是否为枚举值</label>
+              <select class="param-is-enum">
+                <option value="false">不是枚举</option>
+                <option value="true">是枚举</option>
+              </select>
+            </div>
+            <div class="param-block enum-block hidden">
+              <label class="label">枚举值列表</label>
+              <div class="enum-list"></div>
+              <div class="toolbar" style="margin-top: 8px;">
+                <button type="button" class="secondary mini-btn add-enum-btn">新增枚举值</button>
+              </div>
+            </div>
+            <div>
+              <label class="label">是否可选值</label>
+              <select class="param-optional">
+                <option value="false">必选</option>
+                <option value="true">可选</option>
+              </select>
+            </div>
+            <div class="param-block default-block hidden">
+              <label class="label">默认值</label>
+              <input class="param-default" value="${escapeAttr(param.default_value || "")}" placeholder="只有可选参数才生效" />
+            </div>
+            <div class="toolbar">
+              <button type="button" class="ghost remove-param-btn">删除参数</button>
+            </div>
+          </div>
+        `;
+        row.querySelector(".param-value-type").value = param.value_type || "text";
+        row.querySelector(".param-is-enum").value = String(Boolean(param.is_enum));
+        row.querySelector(".param-optional").value = String(param.required === false);
+        const enumList = row.querySelector(".enum-list");
+        const enumValues = Array.isArray(param.enum_values) ? param.enum_values : [];
+        if (enumValues.length === 0) {
+          enumList.appendChild(createEnumItem(""));
+        } else {
+          enumValues.forEach((value) => enumList.appendChild(createEnumItem(value)));
+        }
+        row.querySelector(".add-enum-btn").addEventListener("click", () => {
+          enumList.appendChild(createEnumItem(""));
+        });
+        row.querySelector(".remove-param-btn").addEventListener("click", () => row.remove());
+        const syncParamState = () => {
+          const isEnum = row.querySelector(".param-is-enum").value === "true";
+          const optional = row.querySelector(".param-optional").value === "true";
+          row.querySelector(".enum-block").classList.toggle("hidden", !isEnum);
+          row.querySelector(".default-block").classList.toggle("hidden", !optional);
+          if (!isEnum) {
+            Array.from(enumList.querySelectorAll(".enum-value")).forEach((input) => {
+              input.value = "";
+            });
+          }
+          if (!optional) {
+            row.querySelector(".param-default").value = "";
+          }
+        };
+        row.querySelector(".param-is-enum").addEventListener("change", syncParamState);
+        row.querySelector(".param-optional").addEventListener("change", syncParamState);
+        syncParamState();
+        return row;
+      }
+
+      function createIntentCard(intent = {}) {
+        const internalName = String(intent.name || nextIntentName()).trim();
+        const card = document.createElement("div");
+        card.className = "intent-card";
+        card.innerHTML = `
+          <input class="intent-name" type="hidden" value="${escapeAttr(internalName)}" />
+          <div class="intent-top">
+            <div class="intent-badge">意图</div>
+            <div class="intent-meta">内部名称已固定生成</div>
+          </div>
+          <div class="intent-grid">
+            <div>
+              <label class="label">功能描述</label>
+              <textarea class="intent-description" placeholder="用来控制室内灯光">${escapeText(intent.description || "")}</textarea>
+            </div>
+            <div class="intent-note">页面不再手填意图名称。系统会保留一个稳定的内部 skill 名，并在请求时一起发送给 Gateway。</div>
+          </div>
+
+          <div class="param-section">
+            <div class="param-head">
+              <div class="param-title">参数列表</div>
+              <button type="button" class="secondary add-param-btn">新增参数</button>
+            </div>
+            <div class="param-list params-list"></div>
+          </div>
+
+          <div class="toolbar" style="margin-top: 12px;">
+            <button type="button" class="ghost remove-intent-btn">删除这个意图</button>
+          </div>
+        `;
+
+        const paramsList = card.querySelector(".params-list");
+
+        (intent.params || []).forEach((param) => paramsList.appendChild(createParamRow(param)));
+
+        card.querySelector(".add-param-btn").addEventListener("click", () => {
+          paramsList.appendChild(createParamRow({}));
+        });
+        card.querySelector(".remove-intent-btn").addEventListener("click", () => {
+          card.remove();
+          refreshIntentListMeta();
+        });
+
+        return card;
+      }
+
+      function nextIntentName() {
+        const name = `intent_${intentSeq}`;
+        intentSeq += 1;
+        return name;
+      }
+
+      function syncIntentSeq(intents) {
+        let maxSeq = 0;
+        for (const intent of intents) {
+          const match = String(intent?.name || "").match(/^intent_(\d+)$/);
+          if (!match) continue;
+          maxSeq = Math.max(maxSeq, Number(match[1]));
+        }
+        intentSeq = Math.max(intentSeq, maxSeq + 1);
+      }
+
+      function refreshIntentListMeta() {
+        const cards = Array.from(intentListEl.querySelectorAll(".intent-card"));
+        cards.forEach((card, index) => {
+          const badge = card.querySelector(".intent-badge");
+          if (badge) badge.textContent = `意图 ${index + 1}`;
+        });
+      }
+
+      function readParamRows(container) {
+        return Array.from(container.querySelectorAll(".param-row")).map((row) => {
+          const isEnum = row.querySelector(".param-is-enum").value === "true";
+          const optional = row.querySelector(".param-optional").value === "true";
+          const enumValues = Array.from(row.querySelectorAll(".enum-value"))
+            .map((input) => input.value.trim())
+            .filter(Boolean);
+          return {
+            name: row.querySelector(".param-name").value.trim(),
+            description: row.querySelector(".param-description").value.trim(),
+            value_type: row.querySelector(".param-value-type").value,
+            required: !optional,
+            is_enum: isEnum,
+            enum_values: isEnum ? enumValues : [],
+            default_value: optional ? row.querySelector(".param-default").value.trim() : ""
+          };
+        });
+      }
+
+      function collectIntents() {
+        return Array.from(intentListEl.querySelectorAll(".intent-card")).map((card) => {
+          const description = card.querySelector(".intent-description").value.trim();
+          return {
+            name: card.querySelector(".intent-name").value.trim(),
+            description,
+            params: readParamRows(card.querySelector(".params-list"))
+          };
+        });
+      }
+
+      function isNumericValue(value) {
+        return value !== "" && !Number.isNaN(Number(value));
+      }
+
+      function validateParam(param, intentIndex, paramIndex) {
+        const prefix = `意图 ${intentIndex + 1} 的参数 ${paramIndex + 1}`;
+        if (!param.name) return `${prefix} 缺少参数名`;
+        if (!param.description) return `${prefix} 缺少参数描述`;
+        if (!["text", "number"].includes(param.value_type)) {
+          return `${prefix} 的参数类型无效`;
+        }
+        if (param.is_enum) {
+          if (!Array.isArray(param.enum_values) || param.enum_values.length === 0) {
+            return `${prefix} 选择了枚举，但没有配置枚举值`;
+          }
+          for (const enumValue of param.enum_values) {
+            if (param.value_type === "number" && !isNumericValue(enumValue)) {
+              return `${prefix} 是数字参数，枚举值必须全部是数字`;
+            }
+            if (param.value_type === "text" && isNumericValue(enumValue)) {
+              return `${prefix} 是文字参数，枚举值不能使用纯数字`;
+            }
+          }
+        }
+        if (param.required && param.default_value) {
+          return `${prefix} 是必选参数，不能设置默认值`;
+        }
+        if (!param.required && param.default_value) {
+          if (param.value_type === "number" && !isNumericValue(param.default_value)) {
+            return `${prefix} 是数字参数，默认值必须是数字`;
+          }
+          if (param.is_enum && !param.enum_values.includes(param.default_value)) {
+            return `${prefix} 的默认值必须来自枚举值列表`;
+          }
+        }
+        return "";
+      }
+
+      function validateIntents(intents) {
+        if (intents.length === 0) return "";
+        for (let i = 0; i < intents.length; i += 1) {
+          const intent = intents[i];
+          if (!intent.description) {
+            return `意图 ${i + 1} 缺少功能描述`;
+          }
+          for (let j = 0; j < intent.params.length; j += 1) {
+            const error = validateParam(intent.params[j], i, j);
+            if (error) return error;
+          }
+        }
+        return "";
+      }
+
+      function payload(messageOverride) {
+        return {
+          session_id: sessionEl.value.trim() || "web-user",
+          message: typeof messageOverride === "string" ? messageOverride : messageEl.value.trim(),
+          intents: collectIntents()
+        };
+      }
+
+      function showClientPayload(body) {
+        setOutput(routeOut, `[client payload]\n${JSON.stringify(body, null, 2)}`);
+      }
+
+      async function loadConfig() {
+        try {
+          const res = await fetch("/api/config");
+          const data = await res.json();
+          gatewayInfoEl.value = data.gateway_base_url || "unknown";
+          intentListEl.innerHTML = "";
+          const defaults = Array.isArray(data.default_intents) ? data.default_intents : [];
+          syncIntentSeq(defaults);
+          if (defaults.length > 0) {
+            defaults.forEach((intent) => intentListEl.appendChild(createIntentCard(intent)));
+          }
+          refreshIntentListMeta();
+        } catch (e) {
+          gatewayInfoEl.value = "load config failed";
+          intentListEl.innerHTML = "";
+          refreshIntentListMeta();
+        }
+      }
+
+      document.getElementById("addIntentBtn").addEventListener("click", () => {
+        intentListEl.appendChild(createIntentCard());
+        refreshIntentListMeta();
+      });
+
+      document.getElementById("btnClear").addEventListener("click", () => {
+        setOutput(routeOut, "");
+        setOutput(chatOut, "");
+      });
+
+      document.getElementById("btnSend").addEventListener("click", async () => {
+        if (aborter) aborter.abort();
+        aborter = new AbortController();
+
+        const message = messageEl.value.trim();
+        if (!message) {
+          setOutput(chatOut, "[ERR] 请输入内容", true);
+          return;
+        }
+
+        const intents = collectIntents();
+        const validationError = validateIntents(intents);
+        if (validationError) {
+          setOutput(chatOut, `[ERR] ${validationError}`, true);
+          return;
+        }
+
+        setOutput(chatOut, "");
+        const clientPayload = payload(message);
+        showClientPayload(clientPayload);
+        messageEl.value = "";
+
+        try {
+          const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(clientPayload),
+            signal: aborter.signal
+          });
+
+          if (!res.ok || !res.body) {
+            append(chatOut, `HTTP ${res.status}`, true);
+            return;
+          }
+
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder("utf-8");
+          let buf = "";
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            const parts = buf.split("\n");
+            buf = parts.pop() || "";
+            for (const line of parts) {
+              if (!line.trim()) continue;
+              append(chatOut, line);
+              if (!line.startsWith("data: ")) continue;
+              try {
+                const sse = JSON.parse(line.slice(6));
+                if (sse.type !== "message" || !sse.done) continue;
+                const gatewayResult = JSON.parse(sse.content);
+                setOutput(routeOut, `[client payload]\n${JSON.stringify(clientPayload, null, 2)}\n\n[gateway result]\n${JSON.stringify(gatewayResult, null, 2)}`);
+              } catch (_) {
+                // keep raw stream logs in chat output only
+              }
+            }
+          }
+          if (buf.trim()) append(chatOut, buf.trim());
+        } catch (e) {
+          append(chatOut, String(e), true);
+        }
+      });
+
+      function escapeAttr(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function escapeText(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      loadConfig();
+    </script>
+  </body>
+</html>

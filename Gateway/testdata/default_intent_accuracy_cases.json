@@ -1,0 +1,256 @@
+[
+  {
+    "id": "light_zh_bright",
+    "message": "把客厅灯调到明亮",
+    "expect": {
+      "route": "direct",
+      "skill": "light.adjust",
+      "missing_params": [],
+      "params": {
+        "room_name": { "equals": "客厅" },
+        "brightness": { "equals": "明亮" }
+      }
+    }
+  },
+  {
+    "id": "light_zh_standard",
+    "message": "厨房灯调成标准亮度",
+    "expect": {
+      "route": "direct",
+      "skill": "light.adjust",
+      "missing_params": [],
+      "params": {
+        "room_name": { "equals": "厨房" },
+        "brightness": { "equals": "标准" }
+      }
+    }
+  },
+  {
+    "id": "light_zh_natural",
+    "message": "客厅的灯亮点一点",
+    "expect": {
+      "route": "direct",
+      "skill": "light.adjust",
+      "missing_params": [],
+      "params": {
+        "room_name": { "equals": "客厅" },
+        "brightness": { "equals_any": ["明亮", "标准"] }
+      }
+    }
+  },
+  {
+    "id": "memo_zh_release",
+    "message": "记个备忘，明天发布软件",
+    "expect": {
+      "route": "direct",
+      "skill": "memo.create",
+      "missing_params": [],
+      "params": {
+        "content": { "equals": "明天发布软件" }
+      }
+    }
+  },
+  {
+    "id": "memo_zh_rent",
+    "message": "帮我记一下，下周交房租",
+    "expect": {
+      "route": "direct",
+      "skill": "memo.create",
+      "missing_params": [],
+      "params": {
+        "content": { "equals": "下周交房租" }
+      }
+    }
+  },
+  {
+    "id": "memo_en_call",
+    "message": "Create a memo: call Alice after lunch",
+    "expect": {
+      "route": "direct",
+      "skill": "memo.create",
+      "missing_params": [],
+      "params": {
+        "content": { "equals": "call Alice after lunch" }
+      }
+    }
+  },
+  {
+    "id": "reminder_zh_callmom",
+    "message": "明天上午九点提醒我给妈妈打电话",
+    "expect": {
+      "route": "direct",
+      "skill": "reminder.create",
+      "missing_params": [],
+      "params": {
+        "time": { "equals": "明天上午九点" },
+        "time_period": { "equals": "上午" },
+        "content": { "equals": "给妈妈打电话" }
+      }
+    }
+  },
+  {
+    "id": "reminder_zh_trash",
+    "message": "今天晚上8点提醒我倒垃圾",
+    "expect": {
+      "route": "direct",
+      "skill": "reminder.create",
+      "missing_params": [],
+      "params": {
+        "time": { "equals": "今天晚上8点" },
+        "content": { "equals": "倒垃圾" }
+      }
+    }
+  },
+  {
+    "id": "reminder_en_plants",
+    "message": "Remind me at 7pm to water the plants",
+    "expect": {
+      "route": "direct",
+      "skill": "reminder.create",
+      "missing_params": [],
+      "params": {
+        "time": { "equals": "at 7pm" },
+        "time_period": { "equals": "晚上" },
+        "content": { "equals": "water the plants" }
+      }
+    }
+  },
+  {
+    "id": "todo_zh_milk",
+    "message": "把买牛奶加入待办，今天下班前完成",
+    "expect": {
+      "route": "direct",
+      "skill": "todo.create",
+      "missing_params": [],
+      "params": {
+        "content": { "equals": "买牛奶" },
+        "due_time": { "equals": "今天下班前" }
+      }
+    }
+  },
+  {
+    "id": "todo_zh_reimburse",
+    "message": "创建一个待办，内容是提交报销单",
+    "expect": {
+      "route": "direct",
+      "skill": "todo.create",
+      "missing_params": [],
+      "params": {
+        "content": { "equals": "提交报销单" }
+      }
+    }
+  },
+  {
+    "id": "todo_en_passport",
+    "message": "Add renew passport to my todo list by Friday",
+    "expect": {
+      "route": "direct",
+      "skill": "todo.create",
+      "missing_params": [],
+      "params": {
+        "content": { "equals": "renew passport" },
+        "due_time": { "equals": "by Friday" }
+      }
+    }
+  },
+  {
+    "id": "calendar_zh_review",
+    "message": "下周五下午三点安排一个项目复盘，在A会议室",
+    "expect": {
+      "route": "direct",
+      "skill": "calendar.create",
+      "missing_params": [],
+      "params": {
+        "title": { "equals": "项目复盘" },
+        "time": { "equals": "下周五下午三点" },
+        "time_period": { "equals": "下午" },
+        "location": { "equals": "A会议室" }
+      }
+    }
+  },
+  {
+    "id": "calendar_zh_product",
+    "message": "帮我安排明天下午两点的产品评审",
+    "expect": {
+      "route": "direct",
+      "skill": "calendar.create",
+      "missing_params": [],
+      "params": {
+        "title": { "equals": "产品评审" },
+        "time": { "equals": "明天下午两点" }
+      }
+    }
+  },
+  {
+    "id": "calendar_en_dentist",
+    "message": "Schedule a dentist appointment next Tuesday at 10am in Room 301",
+    "expect": {
+      "route": "direct",
+      "skill": "calendar.create",
+      "missing_params": [],
+      "params": {
+        "title": { "equals": "dentist appointment" },
+        "time": { "equals": "next Tuesday at 10am" },
+        "time_period": { "equals": "上午" },
+        "location": { "equals": "Room 301" }
+      }
+    }
+  },
+  {
+    "id": "weather_zh_tokyo",
+    "message": "东京明天天气怎么样",
+    "expect": {
+      "route": "direct",
+      "skill": "weather.query",
+      "missing_params": [],
+      "params": {
+        "location": { "equals": "东京" },
+        "date": { "equals": "明天" }
+      }
+    }
+  },
+  {
+    "id": "weather_zh_beijing",
+    "message": "北京今天会下雨吗",
+    "expect": {
+      "route": "direct",
+      "skill": "weather.query",
+      "missing_params": [],
+      "params": {
+        "location": { "equals": "北京" },
+        "date": { "equals_any": ["今天", "today"] }
+      }
+    }
+  },
+  {
+    "id": "weather_en_tokyo",
+    "message": "What is the weather in Tokyo tomorrow?",
+    "expect": {
+      "route": "direct",
+      "skill": "weather.query",
+      "missing_params": [],
+      "params": {
+        "location": { "equals": "Tokyo" },
+        "date": { "equals": "tomorrow" }
+      }
+    }
+  },
+  {
+    "id": "greeting_zh",
+    "message": "你好",
+    "expect": {
+      "route": "direct",
+      "skill": "greeting.reply",
+      "missing_params": []
+    }
+  },
+  {
+    "id": "deepmodel_compare",
+    "message": "帮我比较一下 Rust 和 Go 的并发模型",
+    "expect": {
+      "route": "deepmodel",
+      "skill": null,
+      "missing_params": []
+    }
+  }
+]

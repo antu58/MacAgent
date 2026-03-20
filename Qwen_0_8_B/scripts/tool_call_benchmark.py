@@ -105,8 +105,9 @@ def arg_check_pass(mode: str, args_text: str) -> bool:
 
 
 def main():
+    default_port = os.environ.get("PORT", "18081")
     endpoint = normalize_endpoint(
-        sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:18080/v1"
+        sys.argv[1] if len(sys.argv) > 1 else f"http://127.0.0.1:{default_port}/v1"
     )
     model = os.environ.get("MODEL_ID", "mlx-community/Qwen3.5-0.8B-8bit")
     out_dir = os.path.join(

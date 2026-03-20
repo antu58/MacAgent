@@ -9,3 +9,6 @@ __pycache__/
 Main/Agent/InferenceService/EmbeddedModel/Qwen3.5-0.8B-8bit/
 Main/Agent/InferenceService/EmbeddedRuntime/venv/
 Main/Agent/LocalModels/
+Gateway/deploy/.env
+GatewayWeb/deploy/.env
+Qwen_0_8_B/run/*.pid

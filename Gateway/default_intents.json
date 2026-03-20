@@ -1,0 +1,189 @@
+[
+  {
+    "name": "alarm.create",
+    "model_type": "low_precision_multimodal",
+    "route_description": "Use when the user wants to set an alarm clock or wake-up alarm, such as '定闹钟', '定闹铃', 'set an alarm', or 'wake me at 7'. Prefer this over reminder.create for pure alarm-clock requests. Do not use for general reminders with rich reminder content.",
+    "execution_description": "Goal: prepare an alarm clock task. Parameter guidance: time is required and should be normalized to a clock string only, such as '10:00' or '23:00'. Do not keep date words or period words inside time. Example: for '明天早上10点', output time='10:00' and time_period='上午'. For explicit 24-hour forms such as '23:00' or '晚上23:00', keep time='23:00' and use time_period='24小时制'. time_period is an optional enum that describes the time style or day period. label is optional; when the user does not provide a custom label, it may fall back to the default label '闹钟'. Preserve the user's original language where applicable.",
+    "params": [
+      {
+        "name": "time",
+        "description": "alarm trigger time",
+        "value_type": "text",
+        "required": true,
+        "is_enum": false
+      },
+      {
+        "name": "time_period",
+        "description": "optional time period or clock style",
+        "value_type": "text",
+        "required": false,
+        "is_enum": true,
+        "enum_values": ["24小时制", "凌晨", "上午", "下午", "晚上"],
+        "default_value": "24小时制"
+      },
+      {
+        "name": "label",
+        "description": "optional alarm label",
+        "value_type": "text",
+        "required": false,
+        "is_enum": false,
+        "default_value": "闹钟"
+      }
+    ]
+  },
+  {
+    "name": "light.adjust",
+    "model_type": "low_precision_multimodal",
+    "route_description": "Use when the user wants to adjust an indoor light or lamp. Match light control requests such as changing room brightness. Do not use for memo, reminder, calendar, weather, or open-ended explanation requests.",
+    "execution_description": "Goal: prepare a light adjustment task. Parameter guidance: room_name means the target room and should only be filled when the user explicitly mentions a room. brightness means the target brightness enum and may map common phrases like '亮一点', '更亮', '调亮' to '明亮', and '暗一点', '调暗', '柔和一点' to '微亮' only when the mapping is safe. If a brightness phrase cannot be mapped safely, leave brightness empty instead of inventing. Preserve the user's original language.",
+    "params": [
+      {
+        "name": "room_name",
+        "description": "target room",
+        "value_type": "text",
+        "required": false,
+        "is_enum": true,
+        "enum_values": ["卧室", "客厅", "厨房"],
+        "default_value": "卧室"
+      },
+      {
+        "name": "brightness",
+        "description": "target brightness enum",
+        "value_type": "text",
+        "required": false,
+        "is_enum": true,
+        "enum_values": ["微亮", "标准", "明亮"],
+        "default_value": "标准"
+      }
+    ]
+  },
+  {
+    "name": "memo.create",
+    "model_type": "low_precision_multimodal",
+    "route_description": "Use when the user wants to record a memo or note without a reminder trigger time. Prefer this over todo when the user is storing information rather than assigning an action task. Do not use for reminders with trigger time.",
+    "execution_description": "Goal: prepare a memo creation task. Parameter guidance: content is the core memo body. Remove wrapper phrases such as 'create a memo', 'make a note', '记个备忘', '新建备忘录'. Keep only the real content the user wants to remember, and preserve the user's original language. Example: '帮我新建一个备忘录，提醒我明天发布软件' should extract content closer to '明天发布软件' rather than the full command wrapper.",
+    "params": [
+      {
+        "name": "content",
+        "description": "core memo body",
+        "value_type": "text",
+        "required": true,
+        "is_enum": false
+      }
+    ]
+  },
+  {
+    "name": "reminder.create",
+    "model_type": "low_precision_multimodal",
+    "route_description": "Use when the user explicitly asks for a reminder with a trigger time and meaningful reminder content. Prefer this over memo.create and todo.create when a reminder time is part of the request. Do not use for meetings or calendar events. Do not use for pure alarm-clock requests such as '定闹钟', '定闹铃', or 'set an alarm'.",
+    "execution_description": "Goal: prepare a reminder task. Parameter guidance: time is the reminder trigger clock and should be normalized to a clock string only, such as '09:00' or '23:00'. Do not keep date words or period words inside time. Example: for '明天早上9点提醒我开会', output time='09:00' and time_period='上午'. For explicit 24-hour forms such as '23:00' or '晚上23:00', keep time='23:00' and use time_period='24小时制'. content is the reminder body and should exclude wrapper words and the time phrase. Preserve the user's original language where applicable. This intent expects real reminder content, not just a generic alarm-clock request.",
+    "params": [
+      {
+        "name": "time",
+        "description": "reminder trigger time",
+        "value_type": "text",
+        "required": true,
+        "is_enum": false
+      },
+      {
+        "name": "time_period",
+        "description": "optional time period or clock style",
+        "value_type": "text",
+        "required": false,
+        "is_enum": true,
+        "enum_values": ["24小时制", "凌晨", "上午", "下午", "晚上"],
+        "default_value": "24小时制"
+      },
+      {
+        "name": "content",
+        "description": "reminder body",
+        "value_type": "text",
+        "required": true,
+        "is_enum": false
+      }
+    ]
+  },
+  {
+    "name": "todo.create",
+    "model_type": "low_precision_multimodal",
+    "route_description": "Use when the user wants to add a todo or actionable task item. Prefer this over memo.create when the request is clearly about something to do, finish, handle, process, or submit. Do not use for reminders with trigger time.",
+    "execution_description": "Goal: prepare a todo task. Parameter guidance: content is the task body only and should exclude wrapper words and due time. due_time is optional and should preserve the user's original due-time phrase such as '今天下班前' or 'by Friday'. Preserve the user's original language.",
+    "params": [
+      {
+        "name": "content",
+        "description": "task body",
+        "value_type": "text",
+        "required": true,
+        "is_enum": false
+      },
+      {
+        "name": "due_time",
+        "description": "optional due time",
+        "value_type": "text",
+        "required": false,
+        "is_enum": false
+      }
+    ]
+  },
+  {
+    "name": "calendar.create",
+    "model_type": "low_precision_multimodal",
+    "route_description": "Use when the user wants to schedule a real event such as a meeting, appointment, review, sync, visit, or trip. Prefer this over reminder.create for real scheduled events. Do not use for reminders or open-ended explanation requests.",
+    "execution_description": "Goal: prepare a calendar event. Parameter guidance: title is the event subject only and should exclude time and location. time is the event clock and should be normalized to a clock string only, such as '15:00' or '09:30'. Do not keep date words or period words inside time. Example: for '下周五下午三点开复盘会', output time='03:00' and time_period='下午'. For explicit 24-hour forms such as '18:30' or '晚上23:00', keep time='18:30' or '23:00' and use time_period='24小时制'. location is optional and should contain only the event location. Preserve the user's original language where applicable.",
+    "params": [
+      {
+        "name": "title",
+        "description": "event subject",
+        "value_type": "text",
+        "required": true,
+        "is_enum": false
+      },
+      {
+        "name": "time",
+        "description": "event time or range",
+        "value_type": "text",
+        "required": true,
+        "is_enum": false
+      },
+      {
+        "name": "time_period",
+        "description": "optional time period or clock style",
+        "value_type": "text",
+        "required": false,
+        "is_enum": true,
+        "enum_values": ["24小时制", "凌晨", "上午", "下午", "晚上"],
+        "default_value": "24小时制"
+      },
+      {
+        "name": "location",
+        "description": "optional location",
+        "value_type": "text",
+        "required": false,
+        "is_enum": false
+      }
+    ]
+  },
+  {
+    "name": "weather.query",
+    "model_type": "low_precision_multimodal",
+    "route_description": "Use when the user is asking a direct weather, temperature, rain, or forecast question. Prefer this over deepmodel only when the weather intent is clear. Do not use for general knowledge or unrelated explanations.",
+    "execution_description": "Goal: prepare a weather query. Parameter guidance: location is the place name and should preserve the user's original wording. date is optional and should preserve the user's original time scope such as '明天' or 'tomorrow'. Do not invent a location when the user has not provided one.",
+    "params": [
+      {
+        "name": "location",
+        "description": "place name",
+        "value_type": "text",
+        "required": true,
+        "is_enum": false
+      },
+      {
+        "name": "date",
+        "description": "optional date or time scope",
+        "value_type": "text",
+        "required": false,
+        "is_enum": false,
+        "default_value": "today"
+      }
+    ]
+  }
+]

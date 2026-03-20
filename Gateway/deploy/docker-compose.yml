@@ -1,0 +1,43 @@
+services:
+  gateway:
+    image: local/ai-gateway:latest
+    container_name: ai-gateway
+    restart: unless-stopped
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        HTTP_PROXY: ${HTTP_PROXY:-}
+        HTTPS_PROXY: ${HTTPS_PROXY:-}
+        NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,host.docker.internal}
+    environment:
+      PORT: "8080"
+      DEFAULT_INTENTS_FILE: ${DEFAULT_INTENTS_FILE:-/app/default_intents.json}
+      MEMORY_TTL_SECONDS: ${MEMORY_TTL_SECONDS:-600}
+      INTENT_TIMEOUT_SECONDS: ${INTENT_TIMEOUT_SECONDS:-30}
+      EXECUTION_TIMEOUT_SECONDS: ${EXECUTION_TIMEOUT_SECONDS:-60}
+      DEEP_TIMEOUT_SECONDS: ${DEEP_TIMEOUT_SECONDS:-120}
+      INTENT_MODEL_BASE_URL: ${INTENT_MODEL_BASE_URL:-http://host.docker.internal:18081/v1}
+      INTENT_MODEL_NAME: ${INTENT_MODEL_NAME:-mlx-community/Qwen3.5-0.8B-8bit}
+      INTENT_MODEL_API_KEY: ${INTENT_MODEL_API_KEY:-sk-local}
+      LOW_PRECISION_MODEL_BASE_URL: ${LOW_PRECISION_MODEL_BASE_URL:-http://host.docker.internal:18081/v1}
+      LOW_PRECISION_MODEL_NAME: ${LOW_PRECISION_MODEL_NAME:-mlx-community/Qwen3.5-0.8B-8bit}
+      LOW_PRECISION_MODEL_API_KEY: ${LOW_PRECISION_MODEL_API_KEY:-sk-local}
+      LOW_PRECISION_MULTIMODAL_MODEL_BASE_URL: ${LOW_PRECISION_MULTIMODAL_MODEL_BASE_URL:-http://host.docker.internal:18082/v1}
+      LOW_PRECISION_MULTIMODAL_MODEL_NAME: ${LOW_PRECISION_MULTIMODAL_MODEL_NAME:-mlx-community/Qwen3.5-4B-MLX-8bit}
+      LOW_PRECISION_MULTIMODAL_MODEL_API_KEY: ${LOW_PRECISION_MULTIMODAL_MODEL_API_KEY:-sk-local}
+      HIGH_PRECISION_MULTIMODAL_MODEL_BASE_URL: ${HIGH_PRECISION_MULTIMODAL_MODEL_BASE_URL:-}
+      HIGH_PRECISION_MULTIMODAL_MODEL_NAME: ${HIGH_PRECISION_MULTIMODAL_MODEL_NAME:-}
+      HIGH_PRECISION_MULTIMODAL_MODEL_API_KEY: ${HIGH_PRECISION_MULTIMODAL_MODEL_API_KEY:-}
+      DEEP_MODEL_BASE_URL: ${DEEP_MODEL_BASE_URL:-https://api.newcoin.tech/v1}
+      DEEP_MODEL_NAME: ${DEEP_MODEL_NAME:-doubao-seed-1-6-251015}
+      DEEP_MODEL_API_KEY: ${DEEP_MODEL_API_KEY}
+      DEEP_MODEL_INSECURE_SKIP_VERIFY: ${DEEP_MODEL_INSECURE_SKIP_VERIFY:-1}
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,host.docker.internal}
+      http_proxy: ${HTTP_PROXY:-}
+      https_proxy: ${HTTPS_PROXY:-}
+      no_proxy: ${NO_PROXY:-localhost,127.0.0.1,host.docker.internal}
+    ports:
+      - "${HOST_PORT:-19090}:8080"

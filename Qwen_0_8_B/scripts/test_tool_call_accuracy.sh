@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 source "$SCRIPT_DIR/common.env"
 
-ENDPOINT="${1:-http://127.0.0.1:18080/v1}"
+ENDPOINT="${1:-http://127.0.0.1:${PORT}/v1}"
 PYTHON_BIN="${VENV_DIR}/bin/python"
 
 if [[ ! -x "$PYTHON_BIN" ]]; then

@@ -1,0 +1,293 @@
+{
+  "summary": {
+    "total": 20,
+    "passed": 0,
+    "failed": 20,
+    "pass_rate": "0.0%",
+    "avg_latency_ms": 0.27,
+    "by_skill": {
+      "calendar.create": {
+        "total": 3,
+        "passed": 0,
+        "avg_latency_ms": 0.03
+      },
+      "deepmodel": {
+        "total": 1,
+        "passed": 0,
+        "avg_latency_ms": 0.03
+      },
+      "greeting.reply": {
+        "total": 1,
+        "passed": 0,
+        "avg_latency_ms": 0.03
+      },
+      "light.adjust": {
+        "total": 3,
+        "passed": 0,
+        "avg_latency_ms": 1.6
+      },
+      "memo.create": {
+        "total": 3,
+        "passed": 0,
+        "avg_latency_ms": 0.03
+      },
+      "reminder.create": {
+        "total": 3,
+        "passed": 0,
+        "avg_latency_ms": 0.04
+      },
+      "todo.create": {
+        "total": 3,
+        "passed": 0,
+        "avg_latency_ms": 0.03
+      },
+      "weather.query": {
+        "total": 3,
+        "passed": 0,
+        "avg_latency_ms": 0.03
+      }
+    }
+  },
+  "results": [
+    {
+      "index": 1,
+      "id": "light_zh_bright",
+      "message": "把客厅灯调到明亮",
+      "http_status": null,
+      "elapsed_ms": 4.7,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 2,
+      "id": "light_zh_standard",
+      "message": "厨房灯调成标准亮度",
+      "http_status": null,
+      "elapsed_ms": 0.05,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 3,
+      "id": "light_zh_natural",
+      "message": "客厅的灯亮点一点",
+      "http_status": null,
+      "elapsed_ms": 0.04,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 4,
+      "id": "memo_zh_release",
+      "message": "记个备忘，明天发布软件",
+      "http_status": null,
+      "elapsed_ms": 0.04,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 5,
+      "id": "memo_zh_rent",
+      "message": "帮我记一下，下周交房租",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 6,
+      "id": "memo_en_call",
+      "message": "Create a memo: call Alice after lunch",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 7,
+      "id": "reminder_zh_callmom",
+      "message": "明天上午九点提醒我给妈妈打电话",
+      "http_status": null,
+      "elapsed_ms": 0.04,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 8,
+      "id": "reminder_zh_trash",
+      "message": "今天晚上8点提醒我倒垃圾",
+      "http_status": null,
+      "elapsed_ms": 0.04,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 9,
+      "id": "reminder_en_plants",
+      "message": "Remind me at 7pm to water the plants",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 10,
+      "id": "todo_zh_milk",
+      "message": "把买牛奶加入待办，今天下班前完成",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 11,
+      "id": "todo_zh_reimburse",
+      "message": "创建一个待办，内容是提交报销单",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 12,
+      "id": "todo_en_passport",
+      "message": "Add renew passport to my todo list by Friday",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 13,
+      "id": "calendar_zh_review",
+      "message": "下周五下午三点安排一个项目复盘，在A会议室",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 14,
+      "id": "calendar_zh_product",
+      "message": "帮我安排明天下午两点的产品评审",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 15,
+      "id": "calendar_en_dentist",
+      "message": "Schedule a dentist appointment next Tuesday at 10am in Room 301",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 16,
+      "id": "weather_zh_tokyo",
+      "message": "东京明天天气怎么样",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 17,
+      "id": "weather_zh_beijing",
+      "message": "北京今天会下雨吗",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 18,
+      "id": "weather_en_tokyo",
+      "message": "What is the weather in Tokyo tomorrow?",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 19,
+      "id": "greeting_zh",
+      "message": "你好",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    },
+    {
+      "index": 20,
+      "id": "deepmodel_compare",
+      "message": "帮我比较一下 Rust 和 Go 的并发模型",
+      "http_status": null,
+      "elapsed_ms": 0.03,
+      "passed": false,
+      "actual": {},
+      "failures": [
+        "<urlopen error [Errno 1] Operation not permitted>"
+      ]
+    }
+  ]
+}

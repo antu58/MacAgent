@@ -68,7 +68,7 @@ echo "$NEW_PID" >"$PID_FILE"
 sleep 2
 if kill -0 "$NEW_PID" >/dev/null 2>&1; then
   echo "Service started, PID=$NEW_PID"
-  echo "Endpoint: http://127.0.0.1:18080/v1"
+  echo "Endpoint: http://127.0.0.1:$PORT/v1"
   echo "Log: $LOG_FILE"
 else
   echo "Service failed to start. Check log: $LOG_FILE" >&2

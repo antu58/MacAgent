@@ -1,0 +1,13 @@
+services:
+  gateway-web:
+    image: local/gateway-web:latest
+    container_name: gateway-web
+    restart: unless-stopped
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      WEB_PORT: "19091"
+      GATEWAY_BASE_URL: ${GATEWAY_BASE_URL:-http://host.docker.internal:19090}
+    ports:
+      - "${HOST_PORT:-19091}:19091"

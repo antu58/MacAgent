@@ -1,6 +1,6 @@
 # Tool Call 日常任务案例
 
-用于测试 `http://127.0.0.1:18080/v1` 的工具调用行为。
+用于测试 `http://127.0.0.1:18081/v1` 的工具调用行为。
 
 ## 案例与工具列表
 
@@ -40,7 +40,7 @@ chmod +x scripts/test_tool_call_accuracy.sh
 可指定 endpoint：
 
 ```bash
-./scripts/test_tool_call_accuracy.sh http://127.0.0.1:18080/v1/chat/completions
+./scripts/test_tool_call_accuracy.sh http://127.0.0.1:18081/v1/chat/completions
 ```
 
 ## 性能指标说明
