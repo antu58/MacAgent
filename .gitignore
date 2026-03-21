@@ -12,3 +12,4 @@ Main/Agent/LocalModels/
 Gateway/deploy/.env
 GatewayWeb/deploy/.env
 Qwen_0_8_B/run/*.pid
+Qwen_4_B_VLM/run/*.pid
