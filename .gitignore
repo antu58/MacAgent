@@ -8,6 +8,7 @@ __pycache__/
 # Embedded model assets (large binaries)
 Main/Agent/InferenceService/EmbeddedModel/Qwen3.5-0.8B-8bit/
 Main/Agent/InferenceService/EmbeddedRuntime/venv/
+Main/Agent/InferenceService/EmbeddedRuntime/venv.tar.gz
 Main/Agent/LocalModels/
 Gateway/deploy/.env
 GatewayWeb/deploy/.env
