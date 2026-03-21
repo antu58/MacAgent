@@ -30,6 +30,11 @@ type Config struct {
 	Port               string
 	DefaultIntentsFile string
 
+	FeishuSocketEnabled bool
+	FeishuAppID         string
+	FeishuAppSecret     string
+	FeishuOpenBaseURL   string
+
 	IntentModelBaseURL  string
 	IntentModelName     string
 	IntentModelAPIKey   string
@@ -197,6 +202,18 @@ func main() {
 		memStore:       NewMemoryStore(cfg.MemoryTTL),
 	}
 
+	if cfg.FeishuSocketEnabled {
+		bridge, err := newFeishuBridge(gw)
+		if err != nil {
+			log.Fatalf("init feishu bridge failed: %v", err)
+		}
+		go func() {
+			if err := bridge.Start(context.Background()); err != nil {
+				log.Fatal(err)
+			}
+		}()
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", gw.handleHealthz)
 	mux.HandleFunc("/route", gw.handleRoute)
@@ -210,6 +227,7 @@ func main() {
 
 	log.Printf("gateway started at :%s", cfg.Port)
 	log.Printf("default intents: %d loaded from %s", len(defaultIntents), cfg.DefaultIntentsFile)
+	log.Printf("feishu socket enabled: %t", cfg.FeishuSocketEnabled)
 	log.Printf("classifier model: %s (%s)", cfg.IntentModelName, cfg.IntentModelBaseURL)
 	log.Printf("low_precision model: %s (%s)", cfg.LowPrecisionModelName, cfg.LowPrecisionModelBaseURL)
 	log.Printf("low_precision_multimodal model: %s (%s)", cfg.LowPrecisionMultimodalModelName, cfg.LowPrecisionMultimodalModelBaseURL)
@@ -224,6 +242,11 @@ func loadConfig() Config {
 	return Config{
 		Port:               getenv("PORT", "8080"),
 		DefaultIntentsFile: getenv("DEFAULT_INTENTS_FILE", "/app/default_intents.json"),
+
+		FeishuSocketEnabled: getenvBool("FEISHU_SOCKET_ENABLED", false),
+		FeishuAppID:         getenv("FEISHU_APP_ID", ""),
+		FeishuAppSecret:     getenv("FEISHU_APP_SECRET", ""),
+		FeishuOpenBaseURL:   getenv("FEISHU_OPEN_BASE_URL", ""),
 
 		IntentModelBaseURL:  getenv("INTENT_MODEL_BASE_URL", "http://127.0.0.1:18081/v1"),
 		IntentModelName:     getenv("INTENT_MODEL_NAME", "mlx-community/Qwen3.5-0.8B-8bit"),
@@ -1679,6 +1702,8 @@ func inspectSkillParams(skill string, params map[string]any, skillCatalog map[st
 		allowed[param.Name] = param
 	}
 
+	normalized = stripUnsupportedSharedParams(normalized, allowed)
+
 	missing := make([]string, 0, len(spec.Params))
 	issues := make([]string, 0)
 	for name := range normalized {
@@ -1722,12 +1747,47 @@ func inspectSkillParams(skill string, params map[string]any, skillCatalog map[st
 
 func normalizeSkillParams(skill string, params map[string]any) map[string]any {
 	_ = skill
+	if len(params) == 0 {
+		return params
+	}
+	if isEmptyParamValue(params["time"]) && isEmptyParamValue(params["time_period"]) {
+		return params
+	}
 	return normalizeTimeLikeParams(params)
 }
 
 func normalizeSkillParamsWithContext(skill string, params map[string]any, userMessage string) map[string]any {
 	_ = skill
+	if len(params) == 0 {
+		return params
+	}
+	if isEmptyParamValue(params["time"]) && isEmptyParamValue(params["time_period"]) {
+		return params
+	}
 	return normalizeTimeLikeParamsWithContext(params, userMessage)
+}
+
+func stripUnsupportedSharedParams(params map[string]any, allowed map[string]ParamSpec) map[string]any {
+	if len(params) == 0 {
+		return params
+	}
+
+	_, allowTime := allowed["time"]
+	_, allowTimePeriod := allowed["time_period"]
+	if allowTime || allowTimePeriod {
+		return params
+	}
+
+	_, hasTime := params["time"]
+	_, hasTimePeriod := params["time_period"]
+	if !hasTime && !hasTimePeriod {
+		return params
+	}
+
+	cleaned := cloneParams(params)
+	delete(cleaned, "time")
+	delete(cleaned, "time_period")
+	return cleaned
 }
 
 func normalizeTimeLikeParams(params map[string]any) map[string]any {

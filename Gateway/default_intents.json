@@ -34,8 +34,8 @@
   {
     "name": "light.adjust",
     "model_type": "low_precision_multimodal",
-    "route_description": "Use when the user wants to adjust an indoor light or lamp. Match light control requests such as changing room brightness. Do not use for memo, reminder, calendar, weather, or open-ended explanation requests.",
-    "execution_description": "Goal: prepare a light adjustment task. Parameter guidance: room_name means the target room and should only be filled when the user explicitly mentions a room. brightness means the target brightness enum and may map common phrases like '亮一点', '更亮', '调亮' to '明亮', and '暗一点', '调暗', '柔和一点' to '微亮' only when the mapping is safe. If a brightness phrase cannot be mapped safely, leave brightness empty instead of inventing. Preserve the user's original language.",
+    "route_description": "Use when the user wants to control an indoor light or lamp, including turning it on, turning it off, or adjusting brightness. Match requests such as '把卧室灯打开', '关闭客厅灯', '厨房灯调亮一点'. Do not use for memo, reminder, calendar, weather, or open-ended explanation requests.",
+    "execution_description": "Goal: prepare a light control task. Parameter guidance: room_name means the target room and should only be filled when the user explicitly mentions a room. switch_state is a dedicated enum for power state only and should be used for explicit on or off requests such as '打开灯', '开灯', '关灯', '关闭灯'. brightness is a separate brightness enum and must not be used to represent on or off. Map common brightness phrases like '亮一点', '更亮', '调亮' to '明亮', and '暗一点', '调暗', '柔和一点' to '微亮' only when the mapping is safe. If the user only says to turn the light on or off, fill switch_state and leave brightness empty. Preserve the user's original language.",
     "params": [
       {
         "name": "room_name",
@@ -45,6 +45,14 @@
         "is_enum": true,
         "enum_values": ["卧室", "客厅", "厨房"],
         "default_value": "卧室"
+      },
+      {
+        "name": "switch_state",
+        "description": "dedicated power switch state for explicit on or off requests",
+        "value_type": "text",
+        "required": false,
+        "is_enum": true,
+        "enum_values": ["打开", "关闭"]
       },
       {
         "name": "brightness",

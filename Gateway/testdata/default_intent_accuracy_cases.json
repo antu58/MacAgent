@@ -39,6 +39,32 @@
     }
   },
   {
+    "id": "light_zh_turn_on",
+    "message": "把卧室灯打开",
+    "expect": {
+      "route": "direct",
+      "skill": "light.adjust",
+      "missing_params": [],
+      "params": {
+        "room_name": { "equals": "卧室" },
+        "switch_state": { "equals": "打开" }
+      }
+    }
+  },
+  {
+    "id": "light_zh_turn_off",
+    "message": "关闭客厅灯",
+    "expect": {
+      "route": "direct",
+      "skill": "light.adjust",
+      "missing_params": [],
+      "params": {
+        "room_name": { "equals": "客厅" },
+        "switch_state": { "equals": "关闭" }
+      }
+    }
+  },
+  {
     "id": "memo_zh_release",
     "message": "记个备忘，明天发布软件",
     "expect": {

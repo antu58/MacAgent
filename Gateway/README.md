@@ -35,6 +35,22 @@
 - `POST /route`
 - `POST /chat`
 
+## 飞书 Socket 通道
+
+Gateway 现在支持作为飞书机器人的 Socket 模式入口：
+
+- 通过 `FEISHU_SOCKET_ENABLED=1` 打开
+- 通过 `FEISHU_APP_ID` / `FEISHU_APP_SECRET` 鉴权
+- 收到飞书文本消息后，内部仍然复用同一套 `resolveFrontendResult(...)` 流程
+- `ask_user` 会直接回飞书追问
+- `assistant_message` 会直接回飞书文本
+- `intent_result` 会整理成文本摘要回飞书，方便先验证网关路由结果
+
+飞书说明：
+
+- 当前飞书通道先只处理文本消息
+- 建议把密钥放到本地环境变量或 `deploy/.env`，不要写进代码仓库
+
 说明：
 
 - `POST /route` 更偏调试接口
@@ -77,6 +93,9 @@
 ```bash
 cd Gateway
 export DEFAULT_INTENTS_FILE="./default_intents.json"
+export FEISHU_SOCKET_ENABLED="1"
+export FEISHU_APP_ID="<your-feishu-app-id>"
+export FEISHU_APP_SECRET="<your-feishu-app-secret>"
 export INTENT_MODEL_BASE_URL="http://127.0.0.1:18081/v1"
 export INTENT_MODEL_NAME="mlx-community/Qwen3.5-0.8B-8bit"
 export INTENT_MODEL_API_KEY="sk-local"
@@ -94,6 +113,7 @@ go run ./cmd/server
 ```bash
 cd Gateway/deploy
 cp .env.example .env
+# edit .env and fill FEISHU_APP_ID / FEISHU_APP_SECRET when needed
 ./deploy.sh
 ```
 
