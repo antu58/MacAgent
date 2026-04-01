@@ -8,19 +8,19 @@ from starlette.requests import Request
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Qwen 4B VLM local server wrapper")
+    parser = argparse.ArgumentParser(description="Qwen 9B multimodal local server wrapper")
     parser.add_argument("--host", default="0.0.0.0")
-    parser.add_argument("--port", type=int, default=18082)
+    parser.add_argument("--port", type=int, default=18083)
     parser.add_argument("--trust-remote-code", action="store_true")
     parser.add_argument("--prefill-step-size", type=int, default=3072)
     parser.add_argument("--kv-bits", type=int, default=0)
     parser.add_argument("--kv-group-size", type=int, default=64)
-    parser.add_argument("--max-kv-size", type=int, default=int(os.environ.get("MAX_KV_SIZE", "1000")))
+    parser.add_argument("--max-kv-size", type=int, default=int(os.environ.get("MAX_KV_SIZE", "131072")))
     parser.add_argument("--quantized-kv-start", type=int, default=5000)
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=int(os.environ.get("MAX_TOKENS", "1000")),
+        default=int(os.environ.get("MAX_TOKENS", "1024")),
         help="Default max output tokens when request does not specify.",
     )
     args = parser.parse_args()
@@ -57,8 +57,6 @@ def main():
                         payload["enable_thinking"] = False
                         changed = True
 
-                    # Make default output tokens as large as possible when client omits it.
-                    # Clients can still override by explicitly sending max_tokens/max_output_tokens.
                     if (
                         "max_tokens" not in payload
                         and "max_output_tokens" not in payload

@@ -7,8 +7,13 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 # shellcheck source=/dev/null
 source "$SCRIPT_DIR/common.env"
 
-if [[ ! -x "$VENV_DIR/bin/mlx_lm.server" ]]; then
-  echo "Error: mlx_lm.server not found. Run scripts/setup_mlx_service.sh first." >&2
+if [[ ! -x "$VENV_DIR/bin/python" ]]; then
+  echo "Error: Python runtime not found in $VENV_DIR. Run scripts/setup_mlx_service.sh first." >&2
+  exit 1
+fi
+
+if [[ ! -f "$SCRIPT_DIR/run_vlm_server.py" ]]; then
+  echo "Error: run_vlm_server.py not found in $SCRIPT_DIR." >&2
   exit 1
 fi
 
@@ -21,21 +26,19 @@ mkdir -p \
   "$VENV_DIR"
 
 ARGS=(
-  --model "$MODEL_ID"
   --host "$HOST"
   --port "$PORT"
-  --max-tokens "$MAX_TOKENS"
-  --log-level "$LOG_LEVEL"
 )
 
 if [[ "$TRUST_REMOTE_CODE" == "1" ]]; then
   ARGS+=(--trust-remote-code)
 fi
 
-echo "Starting MLX OpenAI-compatible server"
-echo "Model: $MODEL_ID"
+echo "Starting MLX multimodal OpenAI-compatible server"
 echo "Endpoint: http://$HOST:$PORT/v1"
+echo "Default model for requests: $MODEL_ID"
+echo "Default context window: ${MAX_KV_SIZE} tokens"
 echo "Cache root: $MLX_SERVICE_HOME"
 echo "Venv: $VENV_DIR"
 
-exec "$VENV_DIR/bin/mlx_lm.server" "${ARGS[@]}"
+exec "$VENV_DIR/bin/python" "$SCRIPT_DIR/run_vlm_server.py" "${ARGS[@]}"

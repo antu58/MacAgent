@@ -37,6 +37,7 @@ fi
 echo "Starting MLX VLM OpenAI-compatible server"
 echo "Endpoint: http://$HOST:$PORT/v1"
 echo "Default model for requests: $MODEL_ID"
+echo "Default context window: ${MAX_KV_SIZE} tokens"
 echo "Cache root: $MLX_SERVICE_HOME"
 echo "Venv: $VENV_DIR"
 

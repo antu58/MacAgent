@@ -1,13 +1,13 @@
 # Qwen_4_B_VLM 项目说明
 
-更新时间：2026-03-19
+更新时间：2026-04-01
 
 ## 项目目标
 
 本项目用于在本地运行 **Qwen3.5 4B VLM (MLX 8bit)** 模型服务，提供 OpenAI 兼容接口，支持图文输入：
 
 - 服务地址：`http://127.0.0.1:18082/v1`
-- 当前包含 `4B VLM` 模型服务能力
+- 当前包含 `4B VLM` 模型服务能力，且这套脚本就是默认的多模态启动方式
 - 部署方式与现有 `Qwen_0_8_B` / `Qwen_9_B` 保持一致
 
 ## 环境需求
@@ -27,6 +27,8 @@ chmod +x scripts/*.sh
 ./scripts/status_service.sh
 ```
 
+推荐把 `./scripts/start_service.sh` 当作一键启动入口。
+
 停止服务：
 
 ```bash
@@ -39,7 +41,7 @@ chmod +x scripts/*.sh
    - `common.env`：统一配置（模型名、端口、缓存路径）
    - `setup_mlx_service.sh`：初始化依赖并预下载模型
    - `start_mlx_service.sh`：前台启动 VLM 服务
-   - `start_service.sh`：后台启动（自动停止旧实例）
+   - `start_service.sh`：一键启动入口；后台拉起 VLM 服务（自动停止旧实例）
    - `stop_service.sh`：停止后台服务
    - `status_service.sh`：查看服务状态
    - `test_image_chat.sh`：发送一条图文请求验证服务能力
@@ -53,6 +55,14 @@ chmod +x scripts/*.sh
 - `MODEL_ID=mlx-community/Qwen3.5-4B-MLX-8bit`
 - `MLX_SERVICE_HOME=/Users/zhangfeng/.mlx-qwen35-4b-vlm`
 - `PORT=18082`
+- `MAX_KV_SIZE=131072`
+- `MAX_TOKENS=1000`
+
+## 默认上下文配置
+
+- 当前默认上下文窗口为 `131072` tokens（`128K`）
+- 如需覆盖，可在启动前导出：`export MAX_KV_SIZE=65536` 或 `export MAX_KV_SIZE=262144`
+- 图文请求也会占用同一段上下文预算，长图片描述场景建议优先保留更高窗口
 
 ## 图像请求测试
 

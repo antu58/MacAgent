@@ -50,7 +50,7 @@ PYTHON_MAJOR_MINOR="$("$PYTHON_BIN" -c 'import sys; print(f"{sys.version_info.ma
 PYTHON_MAJOR="${PYTHON_MAJOR_MINOR%%.*}"
 PYTHON_MINOR="${PYTHON_MAJOR_MINOR##*.}"
 if (( PYTHON_MAJOR < 3 || (PYTHON_MAJOR == 3 && PYTHON_MINOR < 11) )); then
-  echo "Error: $PYTHON_BIN is Python $PYTHON_MAJOR_MINOR. Python >= 3.11 is required for Qwen3.5 support in mlx-lm." >&2
+  echo "Error: $PYTHON_BIN is Python $PYTHON_MAJOR_MINOR. Python >= 3.11 is required for Qwen3.5 multimodal support in mlx-vlm." >&2
   exit 1
 fi
 
@@ -78,7 +78,7 @@ fi
 
 source "$VENV_DIR/bin/activate"
 python -m pip install --upgrade pip wheel
-python -m pip install --upgrade mlx-lm huggingface_hub
+python -m pip install --upgrade "mlx-vlm[torch]" huggingface_hub
 
 # Pre-download model weights to persistent cache to avoid repeated downloads.
 python - <<'PY'
