@@ -2,18 +2,28 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+RUN_DIR="$ROOT_DIR/run"
 # shellcheck source=/dev/null
 source "$SCRIPT_DIR/common.env"
 
 PLIST_ID="com.local.qwen35.9b.mlx"
 PLIST_TARGET="$HOME/Library/LaunchAgents/${PLIST_ID}.plist"
+LOG_FILE="$RUN_DIR/qwen35-9b-mlx.log"
+ERR_FILE="$RUN_DIR/qwen35-9b-mlx.err.log"
 
-if [[ ! -x "$VENV_DIR/bin/mlx_lm.server" ]]; then
-  echo "Error: $VENV_DIR/bin/mlx_lm.server not found. Run scripts/setup_mlx_service.sh first." >&2
+if [[ ! -x "$VENV_DIR/bin/python" ]]; then
+  echo "Error: $VENV_DIR/bin/python not found. Run scripts/setup_mlx_service.sh first." >&2
+  exit 1
+fi
+
+if [[ ! -f "$SCRIPT_DIR/run_vlm_server.py" ]]; then
+  echo "Error: $SCRIPT_DIR/run_vlm_server.py not found." >&2
   exit 1
 fi
 
 mkdir -p "$HOME/Library/LaunchAgents"
+mkdir -p "$RUN_DIR"
 
 cat > "$PLIST_TARGET" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -35,21 +45,20 @@ cat > "$PLIST_TARGET" <<EOF
     <string>${TRANSFORMERS_CACHE}</string>
     <key>XDG_CACHE_HOME</key>
     <string>${XDG_CACHE_HOME}</string>
+    <key>MAX_KV_SIZE</key>
+    <string>${MAX_KV_SIZE}</string>
+    <key>MAX_TOKENS</key>
+    <string>${MAX_TOKENS}</string>
   </dict>
 
   <key>ProgramArguments</key>
   <array>
-    <string>${VENV_DIR}/bin/mlx_lm.server</string>
-    <string>--model</string>
-    <string>${MODEL_ID}</string>
+    <string>${VENV_DIR}/bin/python</string>
+    <string>${SCRIPT_DIR}/run_vlm_server.py</string>
     <string>--host</string>
     <string>${HOST}</string>
     <string>--port</string>
     <string>${PORT}</string>
-    <string>--max-tokens</string>
-    <string>${MAX_TOKENS}</string>
-    <string>--log-level</string>
-    <string>${LOG_LEVEL}</string>
 EOF
 
 if [[ "$TRUST_REMOTE_CODE" == "1" ]]; then
@@ -62,7 +71,7 @@ cat >> "$PLIST_TARGET" <<EOF
   </array>
 
   <key>WorkingDirectory</key>
-  <string>${MLX_SERVICE_HOME}</string>
+  <string>${ROOT_DIR}</string>
 
   <key>RunAtLoad</key>
   <true/>
@@ -71,16 +80,16 @@ cat >> "$PLIST_TARGET" <<EOF
   <true/>
 
   <key>StandardOutPath</key>
-  <string>/tmp/qwen35-9b-mlx.out.log</string>
+  <string>${LOG_FILE}</string>
   <key>StandardErrorPath</key>
-  <string>/tmp/qwen35-9b-mlx.err.log</string>
+  <string>${ERR_FILE}</string>
 </dict>
 </plist>
 EOF
 
 launchctl unload "$PLIST_TARGET" >/dev/null 2>&1 || true
 launchctl load "$PLIST_TARGET"
-launchctl start "$PLIST_ID"
+launchctl start "$PLIST_ID" >/dev/null 2>&1 || true
 
 echo "launchd service installed: $PLIST_ID"
 echo "plist: $PLIST_TARGET"

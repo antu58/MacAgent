@@ -29,6 +29,7 @@ chmod +x scripts/*.sh
 ```
 
 推荐把 `./scripts/start_service.sh` 当作一键启动入口。
+它会自动打开一个新的 Terminal 会话，并在那个前台会话里拉起多模态服务。
 
 停止服务：
 

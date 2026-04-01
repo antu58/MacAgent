@@ -98,5 +98,5 @@ Setup complete.
 Model: $MODEL_ID
 Persistent cache root: $MLX_SERVICE_HOME
 Start service with:
-  $ROOT_DIR/scripts/start_mlx_service.sh
+  $ROOT_DIR/scripts/start_service.sh
 EOF

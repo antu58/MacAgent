@@ -40,6 +40,29 @@ is_our_vlm_process() {
   [[ "$cmd" == *"/scripts/run_vlm_server.py"* ]]
 }
 
+resolve_service_pid() {
+  if ! command -v lsof >/dev/null 2>&1; then
+    return 1
+  fi
+
+  local pids pid cmd
+  pids="$(lsof -t -iTCP:"$PORT" -sTCP:LISTEN -n -P 2>/dev/null | sort -u || true)"
+  for pid in $pids; do
+    cmd="$(ps -p "$pid" -o command= 2>/dev/null || true)"
+    if is_our_vlm_process "$cmd"; then
+      printf '%s\n' "$pid"
+      return 0
+    fi
+  done
+  return 1
+}
+
+remove_existing_launchd_service() {
+  if [[ -f "$SCRIPT_DIR/uninstall_launchd.sh" ]]; then
+    "$SCRIPT_DIR/uninstall_launchd.sh" >/dev/null 2>&1 || true
+  fi
+}
+
 mkdir -p "$RUN_DIR"
 
 if [[ -f "$PID_FILE" ]]; then
@@ -69,16 +92,28 @@ if command -v lsof >/dev/null 2>&1; then
   fi
 fi
 
-nohup "$SCRIPT_DIR/start_mlx_service.sh" >"$LOG_FILE" 2>&1 &
-NEW_PID=$!
-echo "$NEW_PID" >"$PID_FILE"
-
-sleep 2
-if kill -0 "$NEW_PID" >/dev/null 2>&1; then
-  echo "Service started, PID=$NEW_PID"
-  echo "Endpoint: http://127.0.0.1:$PORT/v1"
-  echo "Log: $LOG_FILE"
-else
-  echo "Service failed to start. Check log: $LOG_FILE" >&2
+if ! command -v osascript >/dev/null 2>&1; then
+  echo "Error: osascript not found. Please run $SCRIPT_DIR/start_mlx_service.sh manually." >&2
   exit 1
 fi
+
+osascript \
+  -e 'tell application "Terminal" to activate' \
+  -e "tell application \"Terminal\" to do script \"cd '$ROOT_DIR' && ./scripts/start_mlx_service.sh\"" \
+  >/dev/null
+
+for _ in {1..20}; do
+  sleep 1
+  ACTUAL_PID="$(resolve_service_pid || true)"
+  if [[ -n "${ACTUAL_PID:-}" ]] && kill -0 "$ACTUAL_PID" >/dev/null 2>&1; then
+    echo "$ACTUAL_PID" >"$PID_FILE"
+    echo "Service started, PID=$ACTUAL_PID"
+    echo "Endpoint: http://127.0.0.1:$PORT/v1"
+    echo "Log: $LOG_FILE"
+    exit 0
+  fi
+done
+
+echo "Service launch requested, but it is not listening on port $PORT yet." >&2
+echo "Please check the opened Terminal window and log: $LOG_FILE" >&2
+exit 1
