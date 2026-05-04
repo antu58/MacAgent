@@ -116,7 +116,7 @@ actor EmbeddedBackendManager {
             "--model", modelPath.path,
             "--host", host,
             "--port", String(port),
-            "--max-tokens", "1024",
+            "--max-tokens", "2048",
             "--log-level", "INFO",
             "--trust-remote-code",
         ]

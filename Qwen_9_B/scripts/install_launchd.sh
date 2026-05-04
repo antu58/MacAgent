@@ -35,6 +35,8 @@ cat > "$PLIST_TARGET" <<EOF
 
   <key>EnvironmentVariables</key>
   <dict>
+    <key>MODEL_ID</key>
+    <string>${MODEL_ID}</string>
     <key>MLX_SERVICE_HOME</key>
     <string>${MLX_SERVICE_HOME}</string>
     <key>HF_HOME</key>
@@ -87,10 +89,12 @@ cat >> "$PLIST_TARGET" <<EOF
 </plist>
 EOF
 
-launchctl unload "$PLIST_TARGET" >/dev/null 2>&1 || true
-launchctl load "$PLIST_TARGET"
-launchctl start "$PLIST_ID" >/dev/null 2>&1 || true
+LAUNCHD_DOMAIN="gui/$(id -u)"
+
+launchctl bootout "$LAUNCHD_DOMAIN" "$PLIST_TARGET" >/dev/null 2>&1 || true
+launchctl bootstrap "$LAUNCHD_DOMAIN" "$PLIST_TARGET"
+launchctl kickstart -k "$LAUNCHD_DOMAIN/$PLIST_ID" >/dev/null 2>&1 || true
 
 echo "launchd service installed: $PLIST_ID"
 echo "plist: $PLIST_TARGET"
-echo "status: launchctl list | grep $PLIST_ID"
+echo "status: launchctl print $LAUNCHD_DOMAIN/$PLIST_ID"

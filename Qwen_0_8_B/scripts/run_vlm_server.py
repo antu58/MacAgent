@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import argparse
-import json
 import os
+import sys
+from pathlib import Path
 
 import uvicorn
-from starlette.requests import Request
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=int(os.environ.get("MAX_TOKENS", "1024")),
+        default=int(os.environ.get("MAX_TOKENS", "2048")),
         help="Default max output tokens when request does not specify.",
     )
     args = parser.parse_args()
@@ -33,51 +33,19 @@ def main():
     os.environ["MAX_KV_SIZE"] = str(args.max_kv_size)
     os.environ["QUANTIZED_KV_START"] = str(args.quantized_kv_start)
 
+    from mlx_vlm import generate as generate_mod
+
+    generate_mod.DEFAULT_MAX_TOKENS = args.max_tokens
+
     from mlx_vlm import server as server_mod
 
     app = server_mod.app
 
-    @app.middleware("http")
-    async def disable_thinking_by_default(request: Request, call_next):
-        if request.method == "POST" and request.url.path in {
-            "/chat/completions",
-            "/v1/chat/completions",
-            "/responses",
-            "/v1/responses",
-        }:
-            body = await request.body()
-            if body:
-                try:
-                    payload = json.loads(body)
-                except json.JSONDecodeError:
-                    payload = None
-                if isinstance(payload, dict):
-                    changed = False
-                    if "enable_thinking" not in payload:
-                        payload["enable_thinking"] = False
-                        changed = True
+    shared_scripts_dir = Path(__file__).resolve().parents[2] / "scripts"
+    sys.path.insert(0, str(shared_scripts_dir))
+    from mlx_vlm_compat import install_compat
 
-                    if (
-                        "max_tokens" not in payload
-                        and "max_output_tokens" not in payload
-                        and args.max_tokens > 0
-                    ):
-                        payload["max_output_tokens"] = args.max_tokens
-                        changed = True
-
-                    if changed:
-                        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-
-                    async def receive():
-                        return {
-                            "type": "http.request",
-                            "body": body,
-                            "more_body": False,
-                        }
-
-                    request._receive = receive
-
-        return await call_next(request)
+    install_compat(app, server_mod, default_max_tokens=args.max_tokens)
 
     uvicorn.run(app, host=args.host, port=args.port, workers=1, reload=False)
 

@@ -36,7 +36,7 @@ payload = {
             ],
         }
     ],
-    "max_tokens": 128,
+    "max_tokens": 1024,
 }
 
 data = json.dumps(payload, ensure_ascii=False).encode("utf-8")

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+source "$SCRIPT_DIR/_model_service.sh"
+
+model_service_main "qwen-0.8b-vlm" "Qwen3.5 0.8B VLM local service" \
+  "Qwen_0_8_B" "http://127.0.0.1:18081/v1" "$@"

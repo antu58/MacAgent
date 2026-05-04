@@ -196,7 +196,7 @@ struct ContentView: View {
             let request = AgentChatRequest(
                 model: modelID,
                 messages: requestMessages,
-                maxTokens: 1024,
+                maxTokens: 2048,
                 endpoint: "",
             )
             let result = try await serviceRouter.chat(request: request)

@@ -109,7 +109,7 @@ def main():
     endpoint = normalize_endpoint(
         sys.argv[1] if len(sys.argv) > 1 else f"http://127.0.0.1:{default_port}/v1"
     )
-    model = os.environ.get("MODEL_ID", "mlx-community/Qwen3.5-0.8B-8bit")
+    model = os.environ.get("MODEL_ID", "mlx-community/Qwen3.5-0.8B-MLX-8bit")
     out_dir = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "run"
     )

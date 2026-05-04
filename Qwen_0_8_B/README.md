@@ -15,7 +15,7 @@
 1. 操作系统：`macOS`（推荐 Apple Silicon，MLX 原生运行）
 2. Python：`3.11+`（已验证 `3.11.15`）
 3. Homebrew：用于安装 Python（可选但推荐）
-4. 网络：首次初始化需要下载 `mlx-vlm[torch]` 依赖；模型仍复用当前 `mlx-community/Qwen3.5-0.8B-8bit`
+4. 网络：首次初始化需要下载 `mlx-vlm[torch]` 依赖；模型仍复用当前 `mlx-community/Qwen3.5-0.8B-MLX-8bit`
 5. 磁盘：至少预留 `5GB+`（模型缓存、虚拟环境、日志）
 
 ## 快速开始
@@ -75,7 +75,7 @@ chmod +x scripts/*.sh
 
 - 当前默认上下文窗口为 `131072` tokens（`128K`）
 - 如需覆盖，可在启动前导出：`export MAX_KV_SIZE=65536` 或 `export MAX_KV_SIZE=262144`
-- 当前默认输出上限仍为 `MAX_TOKENS=1024`
+- 当前默认输出上限为 `MAX_TOKENS=2048`
 
 ## 图像请求测试
 
@@ -100,7 +100,7 @@ chmod +x scripts/*.sh
 
 当前范围：
 
-- 支持 `Qwen3.5-0.8B-8bit (MLX)` 本地多模态服务
+- 支持 `Qwen3.5-0.8B-MLX-8bit (MLX)` 本地多模态服务
 
 后续计划（待补充）：
 

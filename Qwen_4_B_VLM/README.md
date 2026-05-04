@@ -57,7 +57,7 @@ chmod +x scripts/*.sh
 - `MLX_SERVICE_HOME=/Users/zhangfeng/.mlx-qwen35-4b-vlm`
 - `PORT=18082`
 - `MAX_KV_SIZE=131072`
-- `MAX_TOKENS=1000`
+- `MAX_TOKENS=2048`
 
 ## 默认上下文配置
 

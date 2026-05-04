@@ -92,18 +92,23 @@ if command -v lsof >/dev/null 2>&1; then
   fi
 fi
 
-if ! command -v osascript >/dev/null 2>&1; then
-  echo "Error: osascript not found. Please run $SCRIPT_DIR/start_mlx_service.sh manually." >&2
-  exit 1
-fi
+echo "Starting service in background..."
+echo "Endpoint: http://127.0.0.1:$PORT/v1"
+echo "Log: $LOG_FILE"
 
-osascript \
-  -e 'tell application "Terminal" to activate' \
-  -e "tell application \"Terminal\" to do script \"cd '$ROOT_DIR' && ./scripts/start_mlx_service.sh\"" \
-  >/dev/null
+: >"$LOG_FILE"
 
-for _ in {1..20}; do
+(
+  cd "$ROOT_DIR"
+  exec nohup ./scripts/start_mlx_service.sh >"$LOG_FILE" 2>&1
+) &
+START_PID="$!"
+disown "$START_PID" >/dev/null 2>&1 || true
+echo "$START_PID" >"$PID_FILE"
+
+for _ in {1..90}; do
   sleep 1
+
   ACTUAL_PID="$(resolve_service_pid || true)"
   if [[ -n "${ACTUAL_PID:-}" ]] && kill -0 "$ACTUAL_PID" >/dev/null 2>&1; then
     echo "$ACTUAL_PID" >"$PID_FILE"
@@ -112,8 +117,17 @@ for _ in {1..20}; do
     echo "Log: $LOG_FILE"
     exit 0
   fi
+
+  if ! kill -0 "$START_PID" >/dev/null 2>&1; then
+    rm -f "$PID_FILE"
+    echo "Service failed to start. Last log lines:" >&2
+    tail -n 80 "$LOG_FILE" >&2 || true
+    exit 1
+  fi
 done
 
-echo "Service launch requested, but it is not listening on port $PORT yet." >&2
-echo "Please check the opened Terminal window and log: $LOG_FILE" >&2
-exit 1
+echo "Service process started, PID=$START_PID"
+echo "Endpoint is not listening yet; model may still be loading."
+echo "Run status: $SCRIPT_DIR/status_service.sh"
+echo "Follow log: tail -f $LOG_FILE"
+exit 0
