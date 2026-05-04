@@ -14,6 +14,110 @@
 - Gateway: `19090`
 - GatewayWeb: `19091`
 
+## 本地模型服务与接口格式
+
+本地模型统一从根目录的 `model-services/` 启动。比如启动 4B VLM：
+
+```bash
+cd /Users/zhangfeng/Desktop/Project/Apple/MacAgent
+./model-services/qwen-4b-vlm start
+./model-services/qwen-4b-vlm status
+./model-services/qwen-4b-vlm stop
+```
+
+可用模型服务：
+
+| 脚本 | 模型 | OpenAI Base URL | 用途 |
+| --- | --- | --- | --- |
+| `./model-services/qwen-0.8b-vlm` | `mlx-community/Qwen3.5-0.8B-MLX-8bit` | `http://127.0.0.1:18081/v1` | 低延迟意图/分类 |
+| `./model-services/qwen-4b-vlm` | `mlx-community/Qwen3.5-4B-MLX-8bit` | `http://127.0.0.1:18082/v1` | 通用 VLM |
+| `./model-services/qwen-9b-vlm` | `mlx-community/Qwen3.5-9B-MLX-8bit` | `http://127.0.0.1:18083/v1` | 高精度 VLM |
+
+如果 Cherry Studio 报 `Failed to fetch`，先确认服务真的在监听：
+
+```bash
+./model-services/qwen-4b-vlm status
+curl http://127.0.0.1:18082/v1/models
+```
+
+### OpenAI Compatible
+
+OpenAI 兼容格式支持：
+
+- `GET /`
+- `HEAD /`
+- `GET /v1/models`
+- `GET /models`
+- `POST /v1/chat/completions`
+- `POST /chat/completions`
+- `POST /v1/responses`
+- `POST /responses`
+- `GET /health`
+- `POST /unload`
+
+Cherry Studio 使用 OpenAI Compatible 时，4B VLM 示例配置：
+
+- Base URL: `http://127.0.0.1:18082/v1`
+- API Key: `sk-local`
+- Model: `mlx-community/Qwen3.5-4B-MLX-8bit`
+
+Chat Completions 示例：
+
+```json
+{
+  "model": "mlx-community/Qwen3.5-4B-MLX-8bit",
+  "messages": [
+    {"role": "user", "content": "请回答：1+1等于几？"}
+  ],
+  "stream": true
+}
+```
+
+OpenAI 格式下，默认不启用 thinking。需要思考模式时可传任一兼容写法：
+
+```json
+{
+  "enable_thinking": true,
+  "thinking_budget": 512
+}
+```
+
+也兼容 Cherry/常见客户端可能传入的 `enable_thinking: "true"`、`thinking: {"type": "enabled", "budget_tokens": 512}`、`reasoning_effort`、`reasoning: {"effort": "medium"}` 等形式。
+
+thinking 会和最终答案分离：
+
+- 非流式：最终答案在 `choices[0].message.content`，思考内容在 `choices[0].message.reasoning_content` 和 `choices[0].message.reasoning`
+- 流式：最终答案在 `choices[].delta.content`，思考内容在 `choices[].delta.reasoning_content` 和 `choices[].delta.reasoning`
+
+服务端会过滤空的 thinking/content 流片段；只保留有实际文本的 delta，以及正常的 `finish_reason` 结束包。
+
+### Anthropic Messages
+
+同一套模型服务也支持 Anthropic Messages 格式：
+
+- `POST /v1/messages`
+- `POST /messages`
+
+Cherry Studio 使用 Anthropic 格式时，4B VLM 示例配置：
+
+- Base URL: `http://127.0.0.1:18082`
+- API Key: `sk-local`
+- Model: `mlx-community/Qwen3.5-4B-MLX-8bit`
+
+Anthropic thinking 示例：
+
+```json
+{
+  "model": "mlx-community/Qwen3.5-4B-MLX-8bit",
+  "messages": [
+    {"role": "user", "content": "请回答：1+1等于几？"}
+  ],
+  "thinking": {"type": "enabled", "budget_tokens": 512},
+  "max_tokens": 1024,
+  "stream": true
+}
+```
+
 ## 协议主线
 
 项目当前要统一到这条主线：
